@@ -1,8 +1,8 @@
-<?php namespace App\Api\Interfaces;
+<?php
+namespace Tickets\EventsParser\Interfaces;
 
-use Illuminate\Http\Request;
-
-interface EventDataParserInterface {
+interface EventDataParserInterface
+{
     public function parseData($data);
     public function validate($data);
 }

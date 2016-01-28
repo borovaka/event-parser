@@ -1,5 +1,7 @@
-<?php namespace App\Api\Exceptions;
+<?php
+namespace Tickets\EventsParser\Exceptions;
 
-class JsonParserException extends \Exception {
+class JsonParserException extends \Exception
+{
 
 }

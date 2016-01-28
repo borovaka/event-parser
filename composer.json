@@ -1,0 +1,24 @@
+{
+    "name": "tickets/event-parser",
+    "description": "Simple parser for Events data",
+    "license": "MIT",
+    "type": "package",
+    "authors": [
+        {
+            "name": "Borislav Anchev",
+            "email": "borislav@anchev.eu"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.0",
+        "illuminate/support": "~5.0",
+        "justinrainbow/json-schema": "~1.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {"Tickets\\EventsParser\\": "src/"}
+    }
+}

@@ -1,75 +1,52 @@
 <?php
 namespace Tickets\EventsParser;
 
-use JsonSchema\Uri\UriRetriever;
-use JsonSchema\Validator;
+use Illuminate\Http\Request;
 use Tickets\EventsParser\Exceptions\JsonParserException;
 use Tickets\EventsParser\Interfaces\EventDataParserInterface;
 
+/**
+ * Class JsonParser
+ * @package Tickets\EventsParser
+ * @throw JsonParserException
+ */
 class JsonParser implements EventDataParserInterface
 {
 
-    private $jsonSchemaURI;
-    private $requestJson;
 
-    public function __construct()
+    private $rules;
+
+
+
+    public function getParsedData(Request $request)
     {
-        $this->jsonSchemaURI = url('/admin/api/json-schema.json');
+          return $this->validate($request);
+
+    }
+    
+    public function setValidationRules($rules)
+    {
+        $this->rules = $rules;
     }
 
-    /**
-     * @param json $data
-     * @return mixed
-     */
-    public function parseData($json)
+    public function validate($data)
     {
 
-        try {
-
-            if (empty($json) || !is_array(json_decode($json, true))) {
-                throw new JsonParserException('Not a JSON!');
-            }
-
-            $this->requestJson = $json;
-            if ($this->validate()) {
-                return json_decode($this->requestJson, true);
-            }
-
-        } catch (JsonParserException $e) {
-            return $e->getMessage();
+        if(!$data->isJson()) {
+            throw new JsonParserException('',JsonParserException::NOT_JSON);
         }
 
-    }
+        $data = $data->input();
 
-    /**
-     * @param Json $jsonString
-     * @return bool
-     */
-    public function validate($jsonString = null)
-    {
-        $retriever = new UriRetriever;
-        $schema = $retriever->retrieve($this->jsonSchemaURI);
-        $data = is_null($jsonString) ? $this->requestJson : $jsonString;
 
-        // Validate
-        $validator = new Validator();
-        $validator->check(json_decode($data), $schema);
-
-        if ($validator->isValid()) {
-            return true;
-        } else {
-            echo "JSON does not validate. Violations:\n";
-            foreach ($validator->getErrors() as $error) {
-                die(sprintf("[%s] %s\n", $error['property'], $error['message']));
-            }
+        $validator = \Validator::make($data, $this->rules);
+        if($validator->fails()) {
+            throw new JsonParserException($validator->getMessageBag()->toJson(), JsonParserException::VALIDATION_ERROR);
         }
+
+        return $data;
+
     }
 
-    /**
-     * @param \Illuminate\Contracts\Routing\UrlGenerator|string $jsonSchemaURI
-     */
-    public function setJsonSchemaURI($jsonSchemaURI)
-    {
-        $this->jsonSchemaURI = $jsonSchemaURI;
-    }
+
 }

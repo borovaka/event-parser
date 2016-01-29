@@ -8,9 +8,10 @@ class ParseEventData
 
     protected $eventsData;
 
-    public function __construct(EventDataParserInterface $parser, $data)
+    public function __construct(EventDataParserInterface $parser, $data, $rues)
     {
-        $this->eventsData = $parser->parseData($data);
+        $parser->setValidationRules($rues);
+        $this->eventsData = $parser->getParsedData($data);
     }
 
     public function getResult()
